@@ -1,21 +1,19 @@
-import type { Metadata } from "next";
-import "./globals.css";
+'use client' // Mark this component as a Client Component
 
-export const metadata: Metadata = {
-  title: "NBA Streams",
-  description: "NBA Stream Compilation",
-};
+import { SessionProvider } from 'next-auth/react'
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en">
       <body>
-        {children}
+        <SessionProvider>
+          {children}
+        </SessionProvider>
       </body>
     </html>
-  );
+  )
 }
