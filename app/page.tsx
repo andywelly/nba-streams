@@ -35,8 +35,10 @@ export default function HomePage() {
       }
     };
 
-    loadGames();
-  }, []);
+    if (session) {
+      loadGames();
+    }
+  }, [session]);
 
   const handleGameSelect = (gameId: string) => {
     setSelectedGame(`https://embedme.top/embed/alpha/${gameId}/1`);
@@ -70,6 +72,50 @@ export default function HomePage() {
           >
             Sign Out
           </button>
+
+          {/* Game Content - Only show when signed in */}
+          {selectedGame ? (
+            <GamePlayer
+              streamUrl={selectedGame}
+              onBack={handleBackToGames}
+            />
+          ) : (
+            <div className="space-y-8">
+              {isLoading ? (
+                <div className="flex justify-center items-center h-64">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
+                </div>
+              ) : (
+                <>
+                  <section>
+                    <h2 className="text-2xl font-bold mb-4">Today&apos;s Games</h2>
+                    <GameList
+                      games={groupedGames.today}
+                      onSelectGame={handleGameSelect}
+                    />
+                  </section>
+
+                  <section>
+                    <h2 className="text-2xl font-bold mb-4">Tomorrow&apos;s Games</h2>
+                    <GameList
+                      games={groupedGames.tomorrow}
+                      onSelectGame={handleGameSelect}
+                    />
+                  </section>
+
+                  {groupedGames.later.length > 0 && (
+                    <section>
+                      <h2 className="text-2xl font-bold mb-4">Upcoming Games</h2>
+                      <GameList
+                        games={groupedGames.later}
+                        onSelectGame={handleGameSelect}
+                      />
+                    </section>
+                  )}
+                </>
+              )}
+            </div>
+          )}
         </>
       ) : (
         <button
@@ -78,50 +124,6 @@ export default function HomePage() {
         >
           Sign In with GitHub
         </button>
-      )}
-
-      {/* Game Content */}
-      {selectedGame ? (
-        <GamePlayer
-          streamUrl={selectedGame}
-          onBack={handleBackToGames}
-        />
-      ) : (
-        <div className="space-y-8">
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
-            </div>
-          ) : (
-            <>
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Today&apos;s Games</h2>
-                <GameList
-                  games={groupedGames.today}
-                  onSelectGame={handleGameSelect}
-                />
-              </section>
-
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Tomorrow&apos;s Games</h2>
-                <GameList
-                  games={groupedGames.tomorrow}
-                  onSelectGame={handleGameSelect}
-                />
-              </section>
-
-              {groupedGames.later.length > 0 && (
-                <section>
-                  <h2 className="text-2xl font-bold mb-4">Upcoming Games</h2>
-                  <GameList
-                    games={groupedGames.later}
-                    onSelectGame={handleGameSelect}
-                  />
-                </section>
-              )}
-            </>
-          )}
-        </div>
       )}
     </main>
   );
