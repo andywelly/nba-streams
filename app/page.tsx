@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import GameList from '@/components/GameList'
 import GamePlayer from '@/components/GamePlayer'
 import { fetchNBAGames } from '@/lib/api'
-import { Game, GroupedGames } from '@/types'
+import { GroupedGames } from '@/types'
 import { categorizeGamesByDate } from '@/lib/utils'
 
 export default function HomePage() {
@@ -73,7 +73,7 @@ export default function HomePage() {
           ) : (
             <>
               <section>
-                <h2 className="text-2xl font-bold mb-4">Today's Games</h2>
+                <h2 className="text-2xl font-bold mb-4">Today&apos;s Games</h2>
                 <GameList 
                   games={groupedGames.today} 
                   onSelectGame={handleGameSelect} 
@@ -81,7 +81,7 @@ export default function HomePage() {
               </section>
               
               <section>
-                <h2 className="text-2xl font-bold mb-4">Tomorrow's Games</h2>
+                <h2 className="text-2xl font-bold mb-4">Tomorrow&apos;s Games</h2>
                 <GameList 
                   games={groupedGames.tomorrow} 
                   onSelectGame={handleGameSelect} 

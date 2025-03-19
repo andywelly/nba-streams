@@ -1,6 +1,6 @@
 // components/GameList.tsx
 import { Game } from '@/types'
-import GameCard from './GameCard.tsx'
+import GameCard from './GameCard'
 
 interface GameListProps {
   games: Game[]
