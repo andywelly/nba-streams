@@ -31,7 +31,7 @@ export default function GameCard({ game, onSelect }: GameCardProps) {
       <div className="p-4">
         <h2 className="font-semibold text-lg">{game.title}</h2>
         <p className="text-gray-600 text-sm mt-1">
-          {formatGameDate(game.date)}
+          {formatGameDate(game.date)} <span className="font-medium">(AEST)</span>
         </p>
       </div>
     </div>

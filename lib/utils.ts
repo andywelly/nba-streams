@@ -9,16 +9,16 @@ export function isNBAGame(title: string): boolean {
   return teamsFound.length >= 2
 }
 
-// Format game date to US Eastern time
+// Format game date to AEST (Australian Eastern Standard Time)
 export function formatGameDate(dateString: string): string {
-  return new Date(dateString).toLocaleString('en-US', {
-    timeZone: 'America/New_York',
+  return new Date(dateString).toLocaleString('en-AU', {
+    timeZone: 'Australia/Sydney', // AEST timezone
     dateStyle: 'medium',
     timeStyle: 'short'
   })
 }
 
-// Categorize games by date (today, tomorrow, later)
+// Categorize games by date (today, tomorrow, later) using AEST
 export function categorizeGamesByDate(games: Game[]): GroupedGames {
   const grouped: GroupedGames = {
     today: [],
@@ -26,26 +26,26 @@ export function categorizeGamesByDate(games: Game[]): GroupedGames {
     later: []
   }
   
-  // Create dates using US timezone
+  // Create dates using AEST timezone
   const options: Intl.DateTimeFormatOptions = { 
-    timeZone: 'America/New_York',
+    timeZone: 'Australia/Sydney', // AEST timezone
     year: 'numeric', 
     month: '2-digit', 
     day: '2-digit' 
   }
 
-  // Get today and tomorrow dates in US timezone
+  // Get today and tomorrow dates in AEST
   const now = new Date()
-  const todayStr = now.toLocaleDateString('en-US', options)
+  const todayStr = now.toLocaleDateString('en-AU', options)
   
   const tomorrow = new Date(now)
   tomorrow.setDate(tomorrow.getDate() + 1)
-  const tomorrowStr = tomorrow.toLocaleDateString('en-US', options)
+  const tomorrowStr = tomorrow.toLocaleDateString('en-AU', options)
   
   games.forEach(game => {
-    // Parse the game date
+    // Parse the game date in AEST
     const gameDate = new Date(game.date)
-    const gameDateStr = gameDate.toLocaleDateString('en-US', options)
+    const gameDateStr = gameDate.toLocaleDateString('en-AU', options)
     
     if (gameDateStr === todayStr) {
       grouped.today.push(game)
@@ -57,4 +57,14 @@ export function categorizeGamesByDate(games: Game[]): GroupedGames {
   })
   
   return grouped
+}
+
+// Helper function to convert a date to AEST for display
+export function toAESTTime(date: Date): string {
+  return date.toLocaleString('en-AU', {
+    timeZone: 'Australia/Sydney',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  })
 }
