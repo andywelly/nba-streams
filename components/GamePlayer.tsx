@@ -1,25 +1,54 @@
-// components/GamePlayer.tsx
+import React, { useEffect, useRef } from 'react';
+
 interface GamePlayerProps {
-    streamUrl: string
-    onBack: () => void
-  }
-  
-  export default function GamePlayer({ streamUrl, onBack }: GamePlayerProps) {
-    return (
-      <div className="mb-8">
-        <iframe
-          title="NBA Game Stream"
-          src={streamUrl}
-          allowFullScreen={true}
-          allow="encrypted-media; picture-in-picture;"
-          className="w-full h-[500px] border-none"
-        ></iframe>
-        <button 
-          onClick={onBack}
-          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
-        >
-          Back to Games
-        </button>
+  streamUrl: string;
+  onBack: () => void;
+}
+
+export default function GamePlayer({ streamUrl, onBack }: GamePlayerProps) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Automatically request full screen for the iframe
+  useEffect(() => {
+    if (iframeRef.current) {
+      const iframe = iframeRef.current;
+
+      // Request full screen for the iframe
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen().catch((err) => {
+          console.error('Error attempting to enable full-screen mode:', err);
+        });
+      }
+    }
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center mb-8 relative aspect-video">
+      <div style={{ width: '80%', maxWidth: '1200px' }}>
+        <div style={{ position: 'relative', paddingTop: '56.25%' }}>
+          <iframe
+            ref={iframeRef}
+            title="NBA Game Stream"
+            src={streamUrl}
+            allowFullScreen={true}
+            allow="encrypted-media; picture-in-picture;"
+            style={{ 
+              position: 'absolute', 
+              top: 0, 
+              left: 0, 
+              width: '100%', 
+              height: '100%', 
+              border: 'none' 
+            }}
+          ></iframe>
+        </div>
       </div>
-    )
-  }
+      <button 
+        onClick={onBack}
+        className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
+      >
+        Back to Games
+      </button>
+    </div>
+  );
+}
