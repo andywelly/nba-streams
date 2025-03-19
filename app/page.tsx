@@ -9,6 +9,13 @@ interface Game {
   title: string;
   poster: string;
   sources: Source[];
+  date: string; // Added date field
+}
+
+interface GroupedGames {
+  today: Game[];
+  tomorrow: Game[];
+  later: Game[];
 }
 
 const NBA_TEAMS = {
@@ -45,7 +52,11 @@ const NBA_TEAMS = {
 };
 
 export default function Home() {
-  const [nbaGames, setNbaGames] = useState<Game[]>([]);
+  const [groupedGames, setGroupedGames] = useState<GroupedGames>({
+    today: [],
+    tomorrow: [],
+    later: []
+  });
   const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const URL = "https://streamed.su/api/matches/basketball/popular";
   const API = "https://streamed.su";
@@ -57,6 +68,33 @@ export default function Home() {
       title.includes(team)
     );
     return teamsFound.length >= 2;
+  };
+
+  // Check if a date is today, tomorrow, or later (in US time)
+  const categorizeGameDate = (dateString: string): 'today' | 'tomorrow' | 'later' => {
+    // Create dates using US timezone
+    const options: Intl.DateTimeFormatOptions = { 
+      timeZone: 'America/New_York',
+      year: 'numeric', 
+      month: '2-digit', 
+      day: '2-digit' 
+    };
+
+    // Parse the game date (assuming it's in ISO format or similar)
+    const gameDate = new Date(dateString);
+    const gameDateStr = gameDate.toLocaleDateString('en-US', options);
+    
+    // Get today and tomorrow dates in US timezone
+    const now = new Date();
+    const todayStr = now.toLocaleDateString('en-US', options);
+    
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toLocaleDateString('en-US', options);
+    
+    if (gameDateStr === todayStr) return 'today';
+    if (gameDateStr === tomorrowStr) return 'tomorrow';
+    return 'later';
   };
 
   // Fetch NBA games on component mount
@@ -73,7 +111,20 @@ export default function Home() {
         
         // Filter only NBA games
         const nbaGamesOnly = data.filter((game: Game) => isNBAGame(game.title));
-        setNbaGames(nbaGamesOnly);
+        
+        // Group games by date
+        const grouped: GroupedGames = {
+          today: [],
+          tomorrow: [],
+          later: []
+        };
+        
+        nbaGamesOnly.forEach((game: Game) => {
+          const category = categorizeGameDate(game.date);
+          grouped[category].push(game);
+        });
+        
+        setGroupedGames(grouped);
       } catch (error) {
         console.error("Error fetching NBA games:", error);
       }
@@ -88,11 +139,52 @@ export default function Home() {
     setSelectedGame(streamUrl);
   };
 
+  // Function to render game cards
+  const renderGameCards = (games: Game[]) => {
+    if (games.length === 0) {
+      return <p className="text-gray-500">No games scheduled</p>;
+    }
+    
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {games.map((game, index) => (
+          <div 
+            key={index} 
+            className="border rounded-lg overflow-hidden shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+            onClick={() => handleGameClick(game.sources[0]?.id)}
+          >
+            <div className="relative h-48 w-full">
+              {game.poster ? (
+                <img
+                  src={`${API}${game.poster}`}
+                  alt={game.title}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="h-full w-full bg-gray-200 flex items-center justify-center">
+                  <span>No Image Available</span>
+                </div>
+              )}
+            </div>
+            <div className="p-4">
+              <h2 className="font-semibold text-lg">{game.title}</h2>
+              <p className="text-gray-600 text-sm mt-1">{new Date(game.date).toLocaleString('en-US', {
+                timeZone: 'America/New_York',
+                dateStyle: 'medium',
+                timeStyle: 'short'
+              })}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">NBA Streams</h1>
       
-      {selectedGame && (
+      {selectedGame ? (
         <div className="mb-8">
           <iframe
             title="NBA Game Stream"
@@ -110,37 +202,26 @@ export default function Home() {
             Back to Games
           </button>
         </div>
-      )}
-      
-      {!selectedGame && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {nbaGames.length === 0 ? (
-            <p>Loading NBA games...</p>
-          ) : (
-            nbaGames.map((game, index) => (
-              <div 
-                key={index} 
-                className="border rounded-lg overflow-hidden shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
-                onClick={() => handleGameClick(game.sources[0]?.id)}
-              >
-                <div className="relative h-48 w-full">
-                  {game.poster ? (
-                    <img
-                      src={`${API}${game.poster}`}
-                      alt={game.title}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-gray-200 flex items-center justify-center">
-                      <span>No Image Available</span>
-                    </div>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h2 className="font-semibold text-lg">{game.title}</h2>
-                </div>
-              </div>
-            ))
+      ) : (
+        <div className="space-y-8">
+          {/* Today's Games */}
+          <section>
+            <h2 className="text-2xl font-bold mb-4">Today&apos;s Games</h2>
+            {renderGameCards(groupedGames.today)}
+          </section>
+          
+          {/* Tomorrow's Games */}
+          <section>
+            <h2 className="text-2xl font-bold mb-4">Tomorrow&apos;s Games</h2>
+            {renderGameCards(groupedGames.tomorrow)}
+          </section>
+          
+          {/* Future Games */}
+          {groupedGames.later.length > 0 && (
+            <section>
+              <h2 className="text-2xl font-bold mb-4">Upcoming Games</h2>
+              {renderGameCards(groupedGames.later)}
+            </section>
           )}
         </div>
       )}
