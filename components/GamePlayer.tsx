@@ -1,15 +1,33 @@
-// components/GamePlayer.tsx
+import React, { useEffect, useRef } from 'react';
+
 interface GamePlayerProps {
-  streamUrl: string
-  onBack: () => void
+  streamUrl: string;
+  onBack: () => void;
 }
 
 export default function GamePlayer({ streamUrl, onBack }: GamePlayerProps) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // Automatically request full screen for the iframe
+  useEffect(() => {
+    if (iframeRef.current) {
+      const iframe = iframeRef.current;
+
+      // Request full screen for the iframe
+      if (iframe.requestFullscreen) {
+        iframe.requestFullscreen().catch((err) => {
+          console.error('Error attempting to enable full-screen mode:', err);
+        });
+      }
+    }
+  }, []);
+
   return (
     <div className="flex flex-col items-center mb-8 relative aspect-video">
       <div style={{ width: '80%', maxWidth: '1200px' }}>
         <div style={{ position: 'relative', paddingTop: '56.25%' }}>
           <iframe
+            ref={iframeRef}
             title="NBA Game Stream"
             src={streamUrl}
             allowFullScreen={true}
