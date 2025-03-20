@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import GameList from '@/components/gameList';
 import GamePlayer from '@/components/gamePlayer';
 import { fetchNBAGames } from '@/lib/api';
