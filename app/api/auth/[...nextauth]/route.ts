@@ -3,6 +3,30 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { compare } from 'bcrypt';
 import { neon } from '@neondatabase/serverless';
 
+// Extend the Session and JWT types to include the `id` property
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+    };
+  }
+
+  interface User {
+    id: string;
+    email?: string | null;
+    name?: string | null;
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id: string;
+  }
+}
+
 const handler = NextAuth({
   session: {
     strategy: 'jwt',
@@ -61,6 +85,7 @@ const handler = NextAuth({
       return token;
     },
     async session({ session, token }) {
+      session.user = session.user || {};
       if (token.id) {
         session.user.id = token.id;
       }
