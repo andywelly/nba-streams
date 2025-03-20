@@ -14,11 +14,23 @@ export async function POST(request: Request) {
       );
     }
 
-    // Hash the password
-    const hashedPassword = await hash(password, 10);
-
     // Connect to the Neon database
     const sql = neon(`${process.env.DATABASE_URL}`);
+
+    // Check if a user with the same email already exists
+    const existingUser = await sql`
+      SELECT * FROM users WHERE email = ${email}
+    `;
+
+    if (existingUser.length > 0) {
+      return NextResponse.json(
+        { message: 'Email is already registered. Please Sign In' },
+        { status: 400 }
+      );
+    }
+
+    // Hash the password
+    const hashedPassword = await hash(password, 10);
 
     // Insert the user into the database
     await sql`

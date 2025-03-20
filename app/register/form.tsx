@@ -8,10 +8,25 @@ export default function RegisterForm() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  // Password validation rules
+  const validatePassword = (password: string): boolean => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d|\W).{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
+    // Validate password
+    if (!validatePassword(password)) {
+      setError(
+        'Password must be at least 8 characters long, include both uppercase and lowercase letters, and contain at least one number or symbol.'
+      );
+      return;
+    }
+
+    // Submit the form
     const response = await fetch('/api/auth/register', {
       method: 'POST',
       headers: {
@@ -61,6 +76,14 @@ export default function RegisterForm() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          <div className="mt-2 text-sm text-gray-500">
+            Password must:
+            <ul className="list-disc list-inside pl-5">
+              <li>Be at least 8 characters long</li>
+              <li>Include both uppercase and lowercase letters</li>
+              <li>Contain at least one number or symbol</li>
+            </ul>
+          </div>
         </div>
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <button
