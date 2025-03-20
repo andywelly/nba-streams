@@ -64,13 +64,7 @@ export default function HomePage() {
       {/* Authentication Section */}
       {session ? (
         <>
-          <p>Welcome, {session.user?.name}</p>
-          <button
-            onClick={() => signOut()}
-            className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded mb-4"
-          >
-            Sign Out
-          </button>
+
 
           {/* Game Content - Only show when signed in */}
           {selectedGame ? (
