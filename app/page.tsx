@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import GameList from '@/components/GameList';
 import GamePlayer from '@/components/GamePlayer';
 import { fetchNBAGames } from '@/lib/api';
@@ -61,18 +61,10 @@ export default function HomePage() {
 
   return (
     <main className="container mx-auto p-4">
-      <h1 className="text-10xl font-bold mb-6">NBA Streams</h1>
-
       {/* Authentication Section */}
       {session ? (
         <>
-          <p>Welcome, {session.user?.name}</p>
-          <button
-            onClick={() => signOut()}
-            className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded mb-4"
-          >
-            Sign Out
-          </button>
+
 
           {/* Game Content - Only show when signed in */}
           {selectedGame ? (
