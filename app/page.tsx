@@ -7,6 +7,7 @@ import GamePlayer from '@/components/GamePlayer';
 import { fetchNBAGames } from '@/lib/api';
 import { GroupedGames } from '@/types';
 import { categorizeGamesByDate } from '@/lib/utils';
+import '@/app/globals.css';
 
 export default function HomePage() {
   const { data: session } = useSession();
@@ -60,7 +61,7 @@ export default function HomePage() {
 
   return (
     <main className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">NBA Streams</h1>
+      <h1 className="text-10xl font-bold mb-6">NBA Streams</h1>
 
       {/* Authentication Section */}
       {session ? (
