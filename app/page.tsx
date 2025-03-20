@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import GameList from '@/components/gameList';
-import GamePlayer from '@/components/gamePlayer';
+import GameList from '@/components/GameList';
+import GamePlayer from '@/components/GamePlayer';
 import { fetchNBAGames } from '@/lib/api';
 import { GroupedGames } from '@/types';
 import { categorizeGamesByDate } from '@/lib/utils';
