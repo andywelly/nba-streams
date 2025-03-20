@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import GameList from '@/components/GameList';
 import GamePlayer from '@/components/GamePlayer';
 import { fetchNBAGames } from '@/lib/api';
@@ -119,12 +119,23 @@ export default function HomePage() {
           )}
         </>
       ) : (
-        <button
-          onClick={() => signIn('github')}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded mb-4"
-        >
-          Sign In with GitHub
-        </button>
+        <div className="flex flex-col items-center justify-center gap-4">
+          <p className="mb-2">Please sign in to access NBA streams.</p>
+          <button
+            onClick={() => window.location.href = '/login'}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
+          >
+            Sign In
+          </button>
+          <p>Don&apos;t have an account?</p>
+          <button
+            onClick={() => window.location.href = '/register'}
+            className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded"
+          >
+            Register
+          </button>
+         </div>
+
       )}
     </main>
   );

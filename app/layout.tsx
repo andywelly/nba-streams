@@ -1,12 +1,12 @@
-'use client' // Mark this component as a Client Component
+'use client';
 
-import { SessionProvider } from 'next-auth/react'
+import { SessionProvider } from 'next-auth/react';
 import '@/app/globals.css';
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
@@ -16,5 +16,5 @@ export default function RootLayout({
         </SessionProvider>
       </body>
     </html>
-  )
+  );
 }
