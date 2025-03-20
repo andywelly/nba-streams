@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
-import GameList from '@/components/GameList';
-import GamePlayer from '@/components/GamePlayer';
+import GameList from '@/components/gameList';
+import GamePlayer from '@/components/gamePlayer';
 import { fetchNBAGames } from '@/lib/api';
 import { GroupedGames } from '@/types';
 import { categorizeGamesByDate } from '@/lib/utils';
@@ -61,8 +61,6 @@ export default function HomePage() {
 
   return (
     <main className="container mx-auto p-4">
-      <h1 className="text-10xl font-bold mb-6">NBA Streams</h1>
-
       {/* Authentication Section */}
       {session ? (
         <>
