@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 
 export default function Header() {
-  const { data: session } = useSession(); // Get the user session
+  const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {
@@ -17,67 +17,70 @@ export default function Header() {
   return (
     <header className="bg-black">
       <nav className="relative z-10 p-5 flex items-center justify-between">
-        {/* Mobile Burger Menu */}
-        <div className="md:hidden">
-          <button 
-            onClick={toggleMobileMenu}
-            className="text-white focus:outline-none"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? (
-              <X size={28} className="text-white" />
-            ) : (
-              <Menu size={28} className="text-white" />
-            )}
-          </button>
-        </div>
-
-        {/* Left Side: Basketball Logo and NBA Streams */}
+        {/* Left Side: Logo, NBA Streams, and Navigation Links */}
         <div className="flex items-center gap-4">
-          <Link href="/">
-            <Image
-              src="/basketball.svg"
-              alt="Basketball Home Button"
-              width={50}
-              height={50}
-              className="rounded transform hover:scale-110 transition-transform duration-300"
-            />
-          </Link>
-          <Link
-            href="/"
-            className="text-white text-xl font-bold hover:text-gray-300 transition-colors duration-300"
-          >
-            NBA Streams
-          </Link>
-        </div>
+          {/* Mobile Menu Toggle Button */}
+          <div className="md:hidden">
+            <button
+              onClick={toggleMobileMenu}
+              className="text-white focus:outline-none"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? (
+                <X size={28} className="text-white" />
+              ) : (
+                <Menu size={28} className="text-white" />
+              )}
+            </button>
+          </div>
 
-        {/* Desktop Navigation Links */}
-        <ul className="hidden md:flex gap-4 ml-6">
-          <li>
+          {/* Basketball Logo and NBA Streams */}
+          <div className="flex items-center gap-4">
+            <Link href="/">
+              <Image
+                src="/basketball.svg"
+                alt="Basketball Home Button"
+                width={50}
+                height={50}
+                className="rounded transform hover:scale-110 transition-transform duration-300"
+              />
+            </Link>
             <Link
               href="/"
-              className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
+              className="text-white text-xl font-bold hover:text-gray-300 transition-colors duration-300"
             >
-              Home
+              NBA Streams
             </Link>
-          </li>
-          <li>
-            <Link
-              href="/about"
-              className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
-            >
-              About
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/contact"
-              className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
-            >
-              Contact
-            </Link>
-          </li>
-        </ul>
+          </div>
+
+          {/* Desktop Navigation Links */}
+          <ul className="hidden md:flex gap-4 ml-6">
+            <li>
+              <Link
+                href="/"
+                className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
+              >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/about"
+                className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
+              >
+                About
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/contact"
+                className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
+              >
+                Contact
+              </Link>
+            </li>
+          </ul>
+        </div>
 
         {/* Right Side: Sign In / Sign Out */}
         <div>
