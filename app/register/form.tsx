@@ -1,5 +1,6 @@
 'use client';
 
+import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import Link from 'next/link';
 
@@ -42,6 +43,20 @@ export default function RegisterForm() {
     } else {
       alert('Registration successful!');
       window.location.href = '/login';
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signIn('google', { 
+        callbackUrl: '/home',
+        redirect: true
+      });
+      
+      // The page will be redirected by NextAuth
+    } catch (err) {
+      setError('Failed to sign in with Google. Please try again.');
+      console.error('Google sign-in error:', err);
     }
   };
 
@@ -100,6 +115,24 @@ export default function RegisterForm() {
             Sign In
           </Link>
         </p>
+      </div>
+      <div className="mt-6">
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white text-gray-500">Or continue with</span>
+          </div>
+        </div>
+        <div className="mt-6">
+          <button
+            onClick={handleGoogleSignIn}
+            className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          >
+            Sign in with Google
+          </button>
+        </div>
       </div>
     </div>
   );

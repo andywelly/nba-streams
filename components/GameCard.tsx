@@ -1,17 +1,19 @@
-// components/GameCard.tsx
-import { Game } from '@/types'
-import { formatGameDate } from '@/lib/utils'
+import { Game } from '@/types';
+import { formatGameDate } from '@/lib/utils';
 
 interface GameCardProps {
-  game: Game
-  onSelect: () => void
+  game: Game;
+  onSelect: () => void;
 }
 
 export default function GameCard({ game, onSelect }: GameCardProps) {
-  const API_BASE = "https://streamed.su"
-  
+  const API_BASE = 'https://streamed.su';
+
+  // Check if the game has finished
+  const isGameFinished = new Date(game.date) < new Date();
+
   return (
-    <div 
+    <div
       className="border rounded-lg overflow-hidden shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
       onClick={onSelect}
     >
@@ -24,7 +26,9 @@ export default function GameCard({ game, onSelect }: GameCardProps) {
           />
         ) : (
           <div className="h-full w-full bg-gray-200 flex items-center justify-center">
-            <span>No Image Available</span>
+            <span className="text-gray-600">
+              {isGameFinished ? 'Game Finished' : 'No Image Available'}
+            </span>
           </div>
         )}
       </div>
@@ -35,5 +39,5 @@ export default function GameCard({ game, onSelect }: GameCardProps) {
         </p>
       </div>
     </div>
-  )
+  );
 }
