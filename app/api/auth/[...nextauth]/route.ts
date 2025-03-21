@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google'; // Add Google provider
 import { compare } from 'bcrypt';
 import { neon } from '@neondatabase/serverless';
 
@@ -32,6 +33,13 @@ const handler = NextAuth({
     strategy: 'jwt',
   },
   providers: [
+    // Google Provider
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+
+    // Credentials Provider (for email/password login)
     CredentialsProvider({
       name: 'Credentials',
       credentials: {

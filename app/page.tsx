@@ -1,134 +1,73 @@
 'use client'
 
-import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import GameList from '@/components/GameList';
-import GamePlayer from '@/components/GamePlayer';
-import { fetchNBAGames } from '@/lib/api';
-import { GroupedGames } from '@/types';
-import { categorizeGamesByDate } from '@/lib/utils';
-import '@/app/globals.css';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function HomePage() {
-  const { data: session } = useSession();
-  const [groupedGames, setGroupedGames] = useState<GroupedGames>({
-    today: [],
-    tomorrow: [],
-    later: []
-  });
-  const [selectedGame, setSelectedGame] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
-  // Fetch and process NBA games on component mount
+  // Redirect authenticated users if they try to access this page
   useEffect(() => {
-    const loadGames = async () => {
-      try {
-        setIsLoading(true);
-        const nbaGames = await fetchNBAGames();
-        const grouped = categorizeGamesByDate(nbaGames);
-        setGroupedGames(grouped);
-      } catch (err) {
-        setError('Failed to load NBA games. Please try again later.');
-        console.error('Error loading games:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (session) {
-      loadGames();
+    if (status === 'authenticated') {
+      router.push('/home');
     }
-  }, [session]);
+  }, [status, router]);
 
-  const handleGameSelect = (gameId: string) => {
-    setSelectedGame(`https://embedme.top/embed/alpha/${gameId}/1`);
+  const handleSignIn = () => {
+    router.push('/login');
   };
 
-  const handleBackToGames = () => {
-    setSelectedGame(null);
+  const handleRegister = () => {
+    router.push('/register');
   };
 
-  if (error) {
-    return (
-      <div className="container mx-auto p-4">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>{error}</p>
-        </div>
-      </div>
-    );
-  }
+  const handleContinue = () => {
+    router.push('/home');
+  };
 
   return (
-    <main className="container mx-auto p-4">
-      {/* Authentication Section */}
-      {session ? (
-        <>
-
-
-          {/* Game Content - Only show when signed in */}
-          {selectedGame ? (
-            <GamePlayer
-              streamUrl={selectedGame}
-              onBack={handleBackToGames}
-            />
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-50">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
+        <h1 className="text-4xl font-bold text-center text-blue-700">NBA Streams</h1>
+        
+        <div className="flex flex-col space-y-4 mt-8">
+          {status === 'authenticated' ? (
+            <button
+              onClick={handleContinue}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition duration-200"
+            >
+              Continue
+            </button>
           ) : (
-            <div className="space-y-8">
-              {isLoading ? (
-                <div className="flex justify-center items-center h-64">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
+            <>
+              <button
+                onClick={handleSignIn}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition duration-200"
+              >
+                Sign In
+              </button>
+              
+              <div className="relative my-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
                 </div>
-              ) : (
-                <>
-                  <section>
-                    <h2 className="text-2xl font-bold mb-4">Today&apos;s Games</h2>
-                    <GameList
-                      games={groupedGames.today}
-                      onSelectGame={handleGameSelect}
-                    />
-                  </section>
-
-                  <section>
-                    <h2 className="text-2xl font-bold mb-4">Tomorrow&apos;s Games</h2>
-                    <GameList
-                      games={groupedGames.tomorrow}
-                      onSelectGame={handleGameSelect}
-                    />
-                  </section>
-
-                  {groupedGames.later.length > 0 && (
-                    <section>
-                      <h2 className="text-2xl font-bold mb-4">Upcoming Games</h2>
-                      <GameList
-                        games={groupedGames.later}
-                        onSelectGame={handleGameSelect}
-                      />
-                    </section>
-                  )}
-                </>
-              )}
-            </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">or</span>
+                </div>
+              </div>
+              
+              <button
+                onClick={handleRegister}
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-md transition duration-200"
+              >
+                Register
+              </button>
+            </>
           )}
-        </>
-      ) : (
-        <div className="flex flex-col items-center justify-center gap-4">
-          <p className="mb-2">Please sign in to access NBA streams.</p>
-          <button
-            onClick={() => window.location.href = '/login'}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
-          >
-            Sign In
-          </button>
-          <p>Don&apos;t have an account?</p>
-          <button
-            onClick={() => window.location.href = '/register'}
-            className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded"
-          >
-            Register
-          </button>
-         </div>
-
-      )}
+        </div>
+      </div>
     </main>
   );
 }
