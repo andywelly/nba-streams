@@ -3,15 +3,49 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession, signOut } from 'next-auth/react';
-import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Menu, X, User } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function Header() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const isGuestMode = searchParams.get('guest') === 'true';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const router = useRouter();
+  const dropdownRef = useRef(null);
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const toggleProfileDropdown = () => {
+    setProfileDropdownOpen(!profileDropdownOpen);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setProfileDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleSignOut = () => {
+    if (isGuestMode) {
+      // If in guest mode, just redirect to home
+      router.push('/');
+    } else {
+      signOut();
+    }
+    setProfileDropdownOpen(false);
   };
 
   return (
@@ -36,7 +70,7 @@ export default function Header() {
 
           {/* Basketball Logo and NBA Streams */}
           <div className="flex items-center gap-4">
-            <Link href="/">
+            <Link href="/home">
               <Image
                 src="/basketball.svg"
                 alt="Basketball Home Button"
@@ -46,7 +80,7 @@ export default function Header() {
               />
             </Link>
             <Link
-              href="/"
+              href="/home"
               className="text-white text-xl font-bold hover:text-gray-300 transition-colors duration-300"
             >
               NBA Streams
@@ -57,7 +91,7 @@ export default function Header() {
           <ul className="hidden md:flex gap-4 ml-6">
             <li>
               <Link
-                href="/"
+                href="/home"
                 className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
               >
                 Home
@@ -82,15 +116,65 @@ export default function Header() {
           </ul>
         </div>
 
-        {/* Right Side: Sign In / Sign Out */}
-        <div>
-          {session ? (
-            <button
-              onClick={() => signOut()}
-              className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
-            >
-              Sign Out
-            </button>
+        {/* Right Side: Profile Icon or Sign In */}
+        <div className="relative" ref={dropdownRef}>
+          {session || isGuestMode ? (
+            <div>
+              <button
+                onClick={toggleProfileDropdown}
+                className="flex items-center justify-center text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white p-3 rounded-full transition-all duration-300"
+                aria-expanded={profileDropdownOpen}
+                aria-haspopup="true"
+                aria-label="User profile menu"
+              >
+                <User size={20} />
+              </button>
+
+              {/* Profile Dropdown */}
+              {profileDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-black border border-gray-700 rounded-md shadow-lg overflow-hidden z-20">
+                  <div className="p-4 border-b border-gray-700">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-blue-500 rounded-full p-2">
+                        <User size={20} className="text-white" />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium">
+                          {isGuestMode ? "Guest" : session?.user?.name || "User"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="py-1">
+                    {isGuestMode ? (
+                      <Link 
+                        href="/login" 
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--accent-color)] transition-colors"
+                        onClick={() => setProfileDropdownOpen(false)}
+                      >
+                        Login
+                      </Link>
+                    ) : (
+                      <>
+                        <Link 
+                          href="/profile" 
+                          className="block px-4 py-2 text-sm text-white hover:bg-[var(--accent-color)] transition-colors"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          Your Profile
+                        </Link>
+                        <button
+                          onClick={handleSignOut}
+                          className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[var(--accent-color)] transition-colors"
+                        >
+                          Sign Out
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
             <Link
               href="/login"
@@ -107,7 +191,7 @@ export default function Header() {
         <div className="md:hidden bg-black border-t border-gray-700">
           <div className="flex flex-col p-4 space-y-3">
             <Link
-              href="/"
+              href="/home"
               className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
               onClick={() => setMobileMenuOpen(false)}
             >
