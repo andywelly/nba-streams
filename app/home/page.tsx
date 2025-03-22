@@ -14,6 +14,7 @@ export default function NbaHomePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isGuestMode = searchParams.get('guest') === 'true';
+  const [showGuestBanner, setShowGuestBanner] = useState(true);
   
   const [groupedGames, setGroupedGames] = useState<GroupedGames>({
     today: [],
@@ -60,6 +61,10 @@ export default function NbaHomePage() {
   const handleBackToGames = () => {
     setSelectedGame(null);
   };
+  
+  const handleDismissGuestBanner = () => {
+    setShowGuestBanner(false);
+  };
 
   // Show loading state while checking authentication
   if (status === 'loading' && !isGuestMode) {
@@ -88,12 +93,21 @@ export default function NbaHomePage() {
   return (
     <main className="container mx-auto p-4">
       {/* Guest mode indicator */}
-      {isGuestMode && (
-        <div className="mb-4 bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded">
-          <div className="flex">
+      {isGuestMode && showGuestBanner && (
+        <div className="mb-4 bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded relative">
+          <div className="flex justify-between items-center">
             <p className="text-yellow-700">
               You are viewing in guest mode. <a href="/login" className="underline font-medium">Sign in</a> for a personalized experience.
             </p>
+            <button 
+              onClick={handleDismissGuestBanner}
+              className="text-yellow-700 hover:text-yellow-900"
+              aria-label="Dismiss notification"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
           </div>
         </div>
       )}
