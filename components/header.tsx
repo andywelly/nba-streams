@@ -1,5 +1,4 @@
 'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession, signOut } from 'next-auth/react';
@@ -14,7 +13,10 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const router = useRouter();
-  const dropdownRef = useRef(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Create home URL with guest parameter if needed
+  const homeUrl = isGuestMode ? "/home?guest=true" : "/home";
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -26,12 +28,11 @@ export default function Header() {
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setProfileDropdownOpen(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -40,8 +41,8 @@ export default function Header() {
 
   const handleSignOut = () => {
     if (isGuestMode) {
-      // If in guest mode, just redirect to home
-      router.push('/');
+      // If in guest mode, redirect to home with guest parameter
+      router.push('/home?guest=true');
     } else {
       signOut();
     }
@@ -67,10 +68,9 @@ export default function Header() {
               )}
             </button>
           </div>
-
           {/* Basketball Logo and NBA Streams */}
           <div className="flex items-center gap-4">
-            <Link href="/home">
+            <Link href={homeUrl}>
               <Image
                 src="/basketball.svg"
                 alt="Basketball Home Button"
@@ -80,18 +80,17 @@ export default function Header() {
               />
             </Link>
             <Link
-              href="/home"
+              href={homeUrl}
               className="text-white text-xl font-bold hover:text-gray-300 transition-colors duration-300"
             >
               NBA Streams
             </Link>
           </div>
-
           {/* Desktop Navigation Links */}
           <ul className="hidden md:flex gap-4 ml-6">
             <li>
               <Link
-                href="/home"
+                href={homeUrl}
                 className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
               >
                 Home
@@ -99,7 +98,7 @@ export default function Header() {
             </li>
             <li>
               <Link
-                href="/about"
+                href={isGuestMode ? "/about?guest=true" : "/about"}
                 className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
               >
                 About
@@ -107,7 +106,7 @@ export default function Header() {
             </li>
             <li>
               <Link
-                href="/contact"
+                href={isGuestMode ? "/contact?guest=true" : "/contact"}
                 className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
               >
                 Contact
@@ -115,7 +114,6 @@ export default function Header() {
             </li>
           </ul>
         </div>
-
         {/* Right Side: Profile Icon or Sign In */}
         <div className="relative" ref={dropdownRef}>
           {session || isGuestMode ? (
@@ -129,7 +127,6 @@ export default function Header() {
               >
                 <User size={20} />
               </button>
-
               {/* Profile Dropdown */}
               {profileDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-black border border-gray-700 rounded-md shadow-lg overflow-hidden z-20">
@@ -185,27 +182,26 @@ export default function Header() {
           )}
         </div>
       </nav>
-
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-black border-t border-gray-700">
           <div className="flex flex-col p-4 space-y-3">
             <Link
-              href="/home"
+              href={homeUrl}
               className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
               onClick={() => setMobileMenuOpen(false)}
             >
               Home
             </Link>
             <Link
-              href="/about"
+              href={isGuestMode ? "/about?guest=true" : "/about"}
               className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
               onClick={() => setMobileMenuOpen(false)}
             >
               About
             </Link>
             <Link
-              href="/contact"
+              href={isGuestMode ? "/contact?guest=true" : "/contact"}
               className="text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white px-6 py-2 rounded transition-all duration-300"
               onClick={() => setMobileMenuOpen(false)}
             >
