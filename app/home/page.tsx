@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import GameList from '@/components/GameList';
 import GamePlayer from '@/components/GamePlayer';
 import { fetchNBAGames } from '@/lib/api';
@@ -12,6 +12,9 @@ import { categorizeGamesByDate } from '@/lib/utils';
 export default function NbaHomePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isGuestMode = searchParams.get('guest') === 'true';
+  
   const [groupedGames, setGroupedGames] = useState<GroupedGames>({
     today: [],
     tomorrow: [],
@@ -21,12 +24,12 @@ export default function NbaHomePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Redirect unauthorized users
+  // Redirect unauthorized users who are not guests
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (status === 'unauthenticated' && !isGuestMode) {
       router.push('/');
     }
-  }, [status, router]);
+  }, [status, router, isGuestMode]);
 
   // Fetch and process NBA games on component mount
   useEffect(() => {
@@ -44,10 +47,11 @@ export default function NbaHomePage() {
       }
     };
 
-    if (session) {
+    // Allow loading games for both authenticated users and guests
+    if (session || isGuestMode) {
       loadGames();
     }
-  }, [session]);
+  }, [session, isGuestMode]);
 
   const handleGameSelect = (gameId: string) => {
     setSelectedGame(`https://embedme.top/embed/alpha/${gameId}/1`);
@@ -58,7 +62,7 @@ export default function NbaHomePage() {
   };
 
   // Show loading state while checking authentication
-  if (status === 'loading') {
+  if (status === 'loading' && !isGuestMode) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
@@ -66,8 +70,8 @@ export default function NbaHomePage() {
     );
   }
 
-  // Only render content for authenticated users
-  if (!session) {
+  // Only render content for authenticated users or guests
+  if (!session && !isGuestMode) {
     return null; // Will redirect via useEffect
   }
 
@@ -83,6 +87,17 @@ export default function NbaHomePage() {
 
   return (
     <main className="container mx-auto p-4">
+      {/* Guest mode indicator */}
+      {isGuestMode && (
+        <div className="mb-4 bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded">
+          <div className="flex">
+            <p className="text-yellow-700">
+              You are viewing in guest mode. <a href="/login" className="underline font-medium">Sign in</a> for a personalized experience.
+            </p>
+          </div>
+        </div>
+      )}
+      
       {/* Game Content */}
       {selectedGame ? (
         <GamePlayer

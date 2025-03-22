@@ -27,6 +27,10 @@ export default function HomePage() {
     router.push('/home');
   };
 
+  const handleGuestAccess = () => {
+    router.push('/home?guest=true');
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-50">
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
@@ -63,6 +67,22 @@ export default function HomePage() {
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-md transition duration-200"
               >
                 Register
+              </button>
+              
+              <div className="relative my-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">or</span>
+                </div>
+              </div>
+              
+              <button
+                onClick={handleGuestAccess}
+                className="w-full bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-4 rounded-md transition duration-200"
+              >
+                Continue as Guest
               </button>
             </>
           )}
