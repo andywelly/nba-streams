@@ -116,3 +116,4 @@ Users can browse the site and view game listings without creating an account by 
 
 ## License
 
+MIT License Copyright (c) 2025 Andwele Ancheta
