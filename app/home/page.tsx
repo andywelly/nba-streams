@@ -1,10 +1,9 @@
 'use client';
 
-import { Suspense, useState, useEffect } from 'react'; // Import Suspense
+import { Suspense, useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import GameList from '@/components/GameList';
-import GamePlayer from '@/components/GamePlayer';
 import { fetchNBAGames } from '@/lib/api';
 import { GroupedGames } from '@/types';
 import { categorizeGamesByDate } from '@/lib/utils';
@@ -22,7 +21,6 @@ function HomeContent() {
     tomorrow: [],
     later: [],
   });
-  const [selectedGame, setSelectedGame] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,11 +54,8 @@ function HomeContent() {
   }, [session, isGuestMode]);
 
   const handleGameSelect = (gameId: string) => {
-    setSelectedGame(`https://embedme.top/embed/alpha/${gameId}/1`);
-  };
-
-  const handleBackToGames = () => {
-    setSelectedGame(null);
+    // Navigate to the player page with the game ID
+    router.push(`/player?id=${gameId}`);
   };
 
   const handleDismissGuestBanner = () => {
@@ -124,36 +119,32 @@ function HomeContent() {
       )}
 
       {/* Game Content */}
-      {selectedGame ? (
-        <GamePlayer streamUrl={selectedGame} onBack={handleBackToGames} />
-      ) : (
-        <div className="space-y-8">
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
-            </div>
-          ) : (
-            <>
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Today&apos;s Games</h2>
-                <GameList games={groupedGames.today} onSelectGame={handleGameSelect} />
-              </section>
+      <div className="space-y-8">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
+          </div>
+        ) : (
+          <>
+            <section>
+              <h2 className="text-2xl font-bold mb-4">Today&apos;s Games</h2>
+              <GameList games={groupedGames.today} onSelectGame={handleGameSelect} />
+            </section>
 
-              <section>
-                <h2 className="text-2xl font-bold mb-4">Tomorrow&apos;s Games</h2>
-                <GameList games={groupedGames.tomorrow} onSelectGame={handleGameSelect} />
-              </section>
+            <section>
+              <h2 className="text-2xl font-bold mb-4">Tomorrow&apos;s Games</h2>
+              <GameList games={groupedGames.tomorrow} onSelectGame={handleGameSelect} />
+            </section>
 
-              {groupedGames.later.length > 0 && (
-                <section>
-                  <h2 className="text-2xl font-bold mb-4">Upcoming Games</h2>
-                  <GameList games={groupedGames.later} onSelectGame={handleGameSelect} />
-                </section>
-              )}
-            </>
-          )}
-        </div>
-      )}
+            {groupedGames.later.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold mb-4">Upcoming Games</h2>
+                <GameList games={groupedGames.later} onSelectGame={handleGameSelect} />
+              </section>
+            )}
+          </>
+        )}
+      </div>
     </main>
   );
 }
