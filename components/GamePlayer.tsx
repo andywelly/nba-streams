@@ -1,12 +1,21 @@
+'use client'; // Add this directive if not already present
+
 import React, { useRef } from 'react';
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 interface GamePlayerProps {
   streamUrl: string;
-  onBack: () => void;
 }
 
-export default function GamePlayer({ streamUrl, onBack }: GamePlayerProps) {
+export default function GamePlayer({ streamUrl }: GamePlayerProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const router = useRouter(); // Initialize the router
+
+  // Handle the back button click
+  const handleBackClick = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent default behavior (if any)
+    router.back(); // Use the browser's back functionality
+  };
 
   return (
     <div className="flex flex-col items-center mb-8 relative aspect-video">
@@ -30,7 +39,7 @@ export default function GamePlayer({ streamUrl, onBack }: GamePlayerProps) {
         </div>
       </div>
       <button 
-        onClick={onBack}
+        onClick={handleBackClick}
         className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
       >
         Back to Games

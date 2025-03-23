@@ -12,17 +12,13 @@ export default function PlayerPage() {
 
   useEffect(() => {
     if (!gameId) {
-      router.push('/home');
+      router.push('/home'); // Redirect if no game ID is provided
       return;
     }
     
     // Create the stream URL based on the game ID
     setStreamUrl(`https://embedme.top/embed/alpha/${gameId}/1`);
   }, [gameId, router]);
-
-  const handleBackToGames = () => {
-    router.push('/home');
-  };
 
   if (!streamUrl) {
     return (
@@ -34,7 +30,7 @@ export default function PlayerPage() {
 
   return (
     <main className="container mx-auto p-4">
-      <GamePlayer streamUrl={streamUrl} onBack={handleBackToGames} />
+      <GamePlayer streamUrl={streamUrl} />
     </main>
   );
 }
