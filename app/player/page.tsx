@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react'; // Import Suspense
 import { useRouter, useSearchParams } from 'next/navigation';
 import GamePlayer from '@/components/GamePlayer';
 
-export default function PlayerPage() {
+// Component that uses useSearchParams
+function PlayerContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const gameId = searchParams.get('id');
@@ -32,5 +33,14 @@ export default function PlayerPage() {
     <main className="container mx-auto p-4">
       <GamePlayer streamUrl={streamUrl} />
     </main>
+  );
+}
+
+// Main Player Page Component
+export default function PlayerPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PlayerContent />
+    </Suspense>
   );
 }
