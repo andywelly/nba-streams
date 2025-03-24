@@ -9,7 +9,7 @@ interface GameListProps {
 
 export default function GameList({ games, onSelectGame }: GameListProps) {
   if (games.length === 0) {
-    return <p className="text-gray-500">No games scheduled</p>
+    return <p className="text-gray-500">No game streams yet</p>
   }
   
   return (
