@@ -47,7 +47,7 @@ export default function LoginForm() {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">Sign in</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -80,7 +80,7 @@ export default function LoginForm() {
           type="submit"
           className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          Login
+          Sign in
         </button>
       </form>
       <div className="mt-4 text-center">

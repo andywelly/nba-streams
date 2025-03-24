@@ -120,7 +120,7 @@ export default function Header() {
             <div>
               <button
                 onClick={toggleProfileDropdown}
-                className="flex items-center justify-center text-white hover:bg-[var(--accent-color)] hover:border-4 border-dashed hover:border-white p-3 rounded-full transition-all duration-300"
+                className="flex items-center justify-center text-white p-3 rounded-full transition-all duration-300 hover:scale-125"
                 aria-expanded={profileDropdownOpen}
                 aria-haspopup="true"
                 aria-label="User profile menu"
@@ -149,7 +149,7 @@ export default function Header() {
                         className="block px-4 py-2 text-sm text-white hover:bg-[var(--accent-color)] transition-colors"
                         onClick={() => setProfileDropdownOpen(false)}
                       >
-                        Login
+                        Log in
                       </Link>
                     ) : (
                       <>
