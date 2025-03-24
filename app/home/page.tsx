@@ -8,7 +8,6 @@ import { fetchNBAGames } from '@/lib/api';
 import { GroupedGames, Game, NBA_TEAMS } from '@/types';
 import { categorizeGamesByDate } from '@/lib/utils';
 
-// Component that uses useSearchParams
 function HomeContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -24,46 +23,42 @@ function HomeContent() {
   const [favoriteTeamGames, setFavoriteTeamGames] = useState<Game[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [favoriteTeam, setFavoriteTeam] = useState<string | null>(null);
 
-  // Redirect unauthorized users who are not guests
   useEffect(() => {
     if (status === 'unauthenticated' && !isGuestMode) {
       router.push('/');
     }
   }, [status, router, isGuestMode]);
 
-  // Fetch and process NBA games on component mount
   useEffect(() => {
     const loadGames = async () => {
       try {
         setIsLoading(true);
-        
-        // Fetch user's favorite team if authenticated
-        let favoriteTeam = null;
+
         if (session?.user?.id && !isGuestMode) {
           try {
             const response = await fetch('/api/profile');
             if (response.ok) {
               const userData = await response.json();
-              favoriteTeam = userData.favoriteTeam;
+              setFavoriteTeam(userData.favoriteTeam);
             }
           } catch (err) {
             console.error('Error fetching user profile:', err);
           }
         }
-        
-        // Fetch all NBA games
+
         const nbaGames = await fetchNBAGames();
         const grouped = categorizeGamesByDate(nbaGames);
         setGroupedGames(grouped);
-        
+
         if (favoriteTeam) {
           const teamGames = [
             ...grouped.today.filter(game => isTeamInTitle(game.title, favoriteTeam)),
             ...grouped.tomorrow.filter(game => isTeamInTitle(game.title, favoriteTeam)),
-            ...grouped.later.filter(game => isTeamInTitle(game.title, favoriteTeam))
+            ...grouped.later.filter(game => isTeamInTitle(game.title, favoriteTeam)),
           ];
-          
+
           setFavoriteTeamGames(teamGames);
         }
       } catch (err) {
@@ -74,18 +69,16 @@ function HomeContent() {
       }
     };
 
-    // Allow loading games for both authenticated users and guests
     if (session || isGuestMode) {
       loadGames();
     }
-  }, [session, isGuestMode]);
-  
+  }, [session, isGuestMode, favoriteTeam]);
+
   const isTeamInTitle = (title: string, team: string): boolean => {
     return title.includes(NBA_TEAMS[team as keyof typeof NBA_TEAMS]);
   };
 
   const handleGameSelect = (gameId: string) => {
-    // Navigate to the player page with the game ID
     router.push(`/player?id=${gameId}`);
   };
 
@@ -93,7 +86,6 @@ function HomeContent() {
     setShowGuestBanner(false);
   };
 
-  // Show loading state while checking authentication
   if (status === 'loading' && !isGuestMode) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -102,9 +94,8 @@ function HomeContent() {
     );
   }
 
-  // Only render content for authenticated users or guests
   if (!session && !isGuestMode) {
-    return null; // Will redirect via useEffect
+    return null;
   }
 
   if (error) {
@@ -119,13 +110,12 @@ function HomeContent() {
 
   return (
     <main className="container mx-auto p-4">
-      {/* Guest banner for guest mode users */}
       {isGuestMode && showGuestBanner && (
         <div className="mb-8">
           <div className="mb-4 bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded relative">
             <div className="flex justify-between items-center">
               <p className="text-yellow-700">
-                You are viewing in guest mode. <a href="/login" className="underline font-medium">Sign in</a> for a
+                You are viewing in guest mode. <a href="/login" className="underline font-medium">Log in</a> for a
                 personalized experience with your favorite team&apos;s games.
               </p>
               <button
@@ -151,15 +141,23 @@ function HomeContent() {
         </div>
       )}
 
-      {/* Favorite team games section - only shown if user has a favorite team AND there are games */}
-      {!isGuestMode && favoriteTeamGames.length > 0 && (
+      {!isGuestMode && favoriteTeam && favoriteTeamGames.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Your Team&apos;s Games</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            <span className="font-bold">{NBA_TEAMS[favoriteTeam as keyof typeof NBA_TEAMS]}</span> Games
+          </h2>
           <GameList games={favoriteTeamGames} onSelectGame={handleGameSelect} />
         </section>
       )}
 
-      {/* Game Content */}
+      {!isGuestMode && favoriteTeam && favoriteTeamGames.length === 0 && (
+        <section className="mb-8">
+          <h3 className="text-xl font-semibold mb-4">
+            No <span className="font-bold">{NBA_TEAMS[favoriteTeam as keyof typeof NBA_TEAMS]}</span> Games
+          </h3>
+        </section>
+      )}
+
       <div className="space-y-8">
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
@@ -190,7 +188,6 @@ function HomeContent() {
   );
 }
 
-// Main Home Page Component
 export default function NbaHomePage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
