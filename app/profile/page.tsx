@@ -2,20 +2,14 @@
 
 import '@/app/globals.css';
 import { useState, useEffect } from 'react';
-import { NBA_TEAMS } from '@/types';
+import { NBA_TEAMS, User } from '@/types';
 import { useRouter } from 'next/navigation';
-
-interface User {
-  id: string;
-  email: string;
-  favoriteTeam: string | null;
-  provider: string | null;
-}
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [favoriteTeam, setFavoriteTeam] = useState('');
+  const [watchList, setWatchList] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
   const router = useRouter();
@@ -31,6 +25,7 @@ export default function ProfilePage() {
         const userData = await response.json();
         setUser(userData);
         setFavoriteTeam(userData.favoriteTeam || '');
+        setWatchList(userData.watchList || []);
       } catch (error) {
         console.error('Failed to fetch user data:', error);
         router.push('/api/auth/login');
@@ -53,7 +48,10 @@ export default function ProfilePage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ favoriteTeam }),
+        body: JSON.stringify({ 
+          favoriteTeam, 
+          watchList 
+        }),
       });
 
       const data = await response.json();
@@ -72,6 +70,14 @@ export default function ProfilePage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleWatchlistToggle = (teamKey: string) => {
+    setWatchList(prevWatchList => 
+      prevWatchList.includes(teamKey)
+        ? prevWatchList.filter(team => team !== teamKey)
+        : [...prevWatchList, teamKey]
+    );
   };
 
   if (loading) {
@@ -116,6 +122,31 @@ export default function ProfilePage() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Watchlist Teams
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {Object.entries(NBA_TEAMS).map(([key, value]) => (
+                    <div key={key} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id={`team-${key}`}
+                        checked={watchList.includes(key)}
+                        onChange={() => handleWatchlistToggle(key)}
+                        className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label 
+                        htmlFor={`team-${key}`} 
+                        className="text-sm text-gray-700 dark:text-gray-300"
+                      >
+                        {value}
+                      </label>
+                    </div>
+                  ))}
+                </div>
               </div>
               
               {message.text && (
