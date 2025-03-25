@@ -16,38 +16,47 @@ export interface GroupedGames {
   later: Game[];
 }
 
+export interface User {
+  id: string;
+  email: string;
+  username: string | null;
+  favoriteTeam: NBATeam | null;
+  watchList: NBATeam[];
+  provider: string | null;
+  providerId?: string | null;
+}
+
 export const NBA_TEAMS = {
-  "Atlanta Hawks": "Atlanta Hawks",
-  "Boston Celtics": "Boston Celtics",
-  "Brooklyn Nets": "Brooklyn Nets",
-  "Charlotte Hornets": "Charlotte Hornets",
-  "Chicago Bulls": "Chicago Bulls",
-  "Cleveland Cavaliers": "Cleveland Cavaliers",
-  "Dallas Mavericks": "Dallas Mavericks",
-  "Denver Nuggets": "Denver Nuggets",
-  "Detroit Pistons": "Detroit Pistons",
-  "Golden State Warriors": "Golden State Warriors",
-  "Houston Rockets": "Houston Rockets",
-  "Indiana Pacers": "Indiana Pacers",
-  "Los Angeles Clippers": "Los Angeles Clippers",
-  "Los Angeles Lakers": "Los Angeles Lakers",
-  "Memphis Grizzlies": "Memphis Grizzlies",
-  "Miami Heat": "Miami Heat",
-  "Milwaukee Bucks": "Milwaukee Bucks",
-  "Minnesota Timberwolves": "Minnesota Timberwolves",
-  "New Orleans Pelicans": "New Orleans Pelicans",
-  "New York Knicks": "New York Knicks",
-  "Oklahoma City Thunder": "Oklahoma City Thunder",
-  "Orlando Magic": "Orlando Magic",
-  "Philadelphia 76ers": "Philadelphia 76ers",
-  "Phoenix Suns": "Phoenix Suns",
-  "Portland Trail Blazers": "Portland Trail Blazers",
-  "Sacramento Kings": "Sacramento Kings",
-  "San Antonio Spurs": "San Antonio Spurs",
-  "Toronto Raptors": "Toronto Raptors",
-  "Utah Jazz": "Utah Jazz",
-  "Washington Wizards": "Washington Wizards",
+  "ATL": "Atlanta Hawks",
+  "BOS": "Boston Celtics",
+  "BKN": "Brooklyn Nets",
+  "CHA": "Charlotte Hornets",
+  "CHI": "Chicago Bulls",
+  "CLE": "Cleveland Cavaliers",
+  "DAL": "Dallas Mavericks",
+  "DEN": "Denver Nuggets",
+  "DET": "Detroit Pistons",
+  "GSW": "Golden State Warriors",
+  "HOU": "Houston Rockets",
+  "IND": "Indiana Pacers",
+  "LAC": "LA Clippers",
+  "LAL": "Los Angeles Lakers",
+  "MEM": "Memphis Grizzlies",
+  "MIA": "Miami Heat",
+  "MIL": "Milwaukee Bucks",
+  "MIN": "Minnesota Timberwolves",
+  "NOP": "New Orleans Pelicans",
+  "NYK": "New York Knicks",
+  "OKC": "Oklahoma City Thunder",
+  "ORL": "Orlando Magic",
+  "PHI": "Philadelphia 76ers",
+  "PHX": "Phoenix Suns",
+  "POR": "Portland Trail Blazers",
+  "SAC": "Sacramento Kings",
+  "SAS": "San Antonio Spurs",
+  "TOR": "Toronto Raptors",
+  "UTA": "Utah Jazz",
+  "WAS": "Washington Wizards"
 } as const;
 
-//
 export type NBATeam = keyof typeof NBA_TEAMS;
