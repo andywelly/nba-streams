@@ -153,7 +153,7 @@ function HomeContent() {
       {!isGuestMode && favoriteTeam && favoriteTeamGames.length === 0 && (
         <section className="mb-8">
           <h3 className="text-xl font-semibold mb-4">
-            No <span className="font-bold">{NBA_TEAMS[favoriteTeam as keyof typeof NBA_TEAMS]}</span> Games
+            No <span className="font-bold">{NBA_TEAMS[favoriteTeam as keyof typeof NBA_TEAMS]}</span> Games Today
           </h3>
         </section>
       )}
