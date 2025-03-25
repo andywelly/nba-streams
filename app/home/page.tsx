@@ -21,7 +21,7 @@ function HomeContent() {
     later: [],
   });
   const [favoriteTeamGames, setFavoriteTeamGames] = useState<Game[]>([]);
-  const [watchlistTeamGames, setWatchlistTeamGames] = useState<{[team: string]: Game[]}>({});
+  const [watchlistTeamGames, setWatchlistTeamGames] = useState<Game[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [favoriteTeam, setFavoriteTeam] = useState<string | null>(null);
@@ -53,10 +53,6 @@ function HomeContent() {
               // Use setter functions to update state
               setFavoriteTeam(fetchedFavoriteTeam);
               setWatchList(fetchedWatchList);
-
-              // Log for debugging
-              console.log('Fetched Favorite Team:', fetchedFavoriteTeam);
-              console.log('Fetched Watchlist:', fetchedWatchList);
             } else {
               console.error('Failed to fetch profile:', response.statusText);
             }
@@ -78,15 +74,13 @@ function HomeContent() {
 
         // Filter games for watchlist teams
         if (watchList.length > 0) {
-          const watchlistGames: {[team: string]: Game[]} = {};
+          const allWatchlistGames: Game[] = [];
           watchList.forEach(team => {
             const teamGames = getTeamGames(grouped, team);
-            if (teamGames.length > 0) {
-              watchlistGames[team] = teamGames;
-            }
+            allWatchlistGames.push(...teamGames);
           });
 
-          setWatchlistTeamGames(watchlistGames);
+          setWatchlistTeamGames(allWatchlistGames);
         }
       } catch (err) {
         setError('Failed to load NBA games. Please try again later.');
@@ -191,17 +185,13 @@ function HomeContent() {
         </section>
       )}
 
-      {!isGuestMode && watchList && Object.keys(watchlistTeamGames).length > 0 && (
+      {!isGuestMode && watchList && watchlistTeamGames.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">Watchlist Teams Games</h2>
-          {Object.entries(watchlistTeamGames).map(([team, games]) => (
-            <div key={team} className="mb-6">
-              <h3 className="text-xl font-semibold mb-3">
-                {NBA_TEAMS[team as keyof typeof NBA_TEAMS]} Games
-              </h3>
-              <GameList games={games} onSelectGame={handleGameSelect} />
-            </div>
-          ))}
+          <h2 className="text-2xl font-bold mb-4">Watchlist Games</h2>
+          <div className="text-sm text-gray-600 mb-4">
+            {watchList.map(team => NBA_TEAMS[team as keyof typeof NBA_TEAMS]).join(', ')}
+          </div>
+          <GameList games={watchlistTeamGames} onSelectGame={handleGameSelect} />
         </section>
       )}
 
