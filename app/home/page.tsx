@@ -21,9 +21,11 @@ function HomeContent() {
     later: [],
   });
   const [favoriteTeamGames, setFavoriteTeamGames] = useState<Game[]>([]);
+  const [watchlistTeamGames, setWatchlistTeamGames] = useState<{[team: string]: Game[]}>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [favoriteTeam, setFavoriteTeam] = useState<string | null>(null);
+  const [watchList, setWatchList] = useState<string[]>([]);
 
   useEffect(() => {
     if (status === 'unauthenticated' && !isGuestMode) {
@@ -35,31 +37,56 @@ function HomeContent() {
     const loadGames = async () => {
       try {
         setIsLoading(true);
+        setError(null);
 
+        // Only fetch profile if there's a valid session and not in guest mode
         if (session?.user?.id && !isGuestMode) {
           try {
             const response = await fetch('/api/profile');
             if (response.ok) {
               const userData = await response.json();
-              setFavoriteTeam(userData.favoriteTeam);
+              
+              // Safely set favorite team and watchlist
+              const fetchedFavoriteTeam = userData.favoriteTeam || null;
+              const fetchedWatchList = userData.watchList || [];
+
+              // Use setter functions to update state
+              setFavoriteTeam(fetchedFavoriteTeam);
+              setWatchList(fetchedWatchList);
+
+              // Log for debugging
+              console.log('Fetched Favorite Team:', fetchedFavoriteTeam);
+              console.log('Fetched Watchlist:', fetchedWatchList);
+            } else {
+              console.error('Failed to fetch profile:', response.statusText);
             }
           } catch (err) {
             console.error('Error fetching user profile:', err);
           }
         }
 
+        // Fetch NBA games
         const nbaGames = await fetchNBAGames();
         const grouped = categorizeGamesByDate(nbaGames);
         setGroupedGames(grouped);
 
+        // Filter games for favorite team
         if (favoriteTeam) {
-          const teamGames = [
-            ...grouped.today.filter(game => isTeamInTitle(game.title, favoriteTeam)),
-            ...grouped.tomorrow.filter(game => isTeamInTitle(game.title, favoriteTeam)),
-            ...grouped.later.filter(game => isTeamInTitle(game.title, favoriteTeam)),
-          ];
-
+          const teamGames = getTeamGames(grouped, favoriteTeam);
           setFavoriteTeamGames(teamGames);
+        }
+
+        // Filter games for watchlist teams
+        if (watchList.length > 0) {
+          const watchlistGames: {[team: string]: Game[]} = {};
+          watchList.forEach(team => {
+            const teamGames = getTeamGames(grouped, team);
+            if (teamGames.length > 0) {
+              watchlistGames[team] = teamGames;
+            }
+          });
+
+          setWatchlistTeamGames(watchlistGames);
         }
       } catch (err) {
         setError('Failed to load NBA games. Please try again later.');
@@ -69,13 +96,19 @@ function HomeContent() {
       }
     };
 
+    // Only load games if there's a session or guest mode is active
     if (session || isGuestMode) {
       loadGames();
     }
-  }, [session, isGuestMode, favoriteTeam]);
+  }, [session, isGuestMode]);
 
-  const isTeamInTitle = (title: string, team: string): boolean => {
-    return title.includes(NBA_TEAMS[team as keyof typeof NBA_TEAMS]);
+  const getTeamGames = (grouped: GroupedGames, team: string): Game[] => {
+    const teamName = NBA_TEAMS[team as keyof typeof NBA_TEAMS];
+    return [
+      ...grouped.today.filter(game => game.title.includes(teamName)),
+      ...grouped.tomorrow.filter(game => game.title.includes(teamName)),
+      ...grouped.later.filter(game => game.title.includes(teamName)),
+    ];
   };
 
   const handleGameSelect = (gameId: string) => {
@@ -155,6 +188,20 @@ function HomeContent() {
           <h3 className="text-xl font-semibold mb-4">
             No <span className="font-bold">{NBA_TEAMS[favoriteTeam as keyof typeof NBA_TEAMS]}</span> Games Today
           </h3>
+        </section>
+      )}
+
+      {!isGuestMode && watchList && Object.keys(watchlistTeamGames).length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">Watchlist Teams Games</h2>
+          {Object.entries(watchlistTeamGames).map(([team, games]) => (
+            <div key={team} className="mb-6">
+              <h3 className="text-xl font-semibold mb-3">
+                {NBA_TEAMS[team as keyof typeof NBA_TEAMS]} Games
+              </h3>
+              <GameList games={games} onSelectGame={handleGameSelect} />
+            </div>
+          ))}
         </section>
       )}
 

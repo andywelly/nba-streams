@@ -13,7 +13,12 @@ export async function GET() {
 
     const sql = neon(`${process.env.DATABASE_URL}`);
     const users = await sql`
-      SELECT id, email, favorite_team, provider
+      SELECT 
+        id, 
+        email, 
+        favorite_team, 
+        provider,
+        "watchList"
       FROM users
       WHERE id = ${session.user.id}
     `;
@@ -23,10 +28,12 @@ export async function GET() {
     }
 
     const user = users[0];
+    
     return NextResponse.json({
       id: user.id,
       email: user.email,
       favoriteTeam: user.favorite_team,
+      watchList: user.watchList || [],
       provider: user.provider,
     });
   } catch (error) {

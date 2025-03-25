@@ -19,10 +19,12 @@ export interface GroupedGames {
 export interface User {
   id: string;
   email: string;
-  favoriteTeam: string | null;
+  username: string | null;
+  favoriteTeam: NBATeam | null;
+  watchList: NBATeam[];
   provider: string | null;
+  providerId?: string | null;
 }
-
 
 export const NBA_TEAMS = {
   "ATL": "Atlanta Hawks",
