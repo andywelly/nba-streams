@@ -94,6 +94,7 @@ function HomeContent() {
     if (session || isGuestMode) {
       loadGames();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, isGuestMode]);
 
   const getTeamGames = (grouped: GroupedGames, team: string): Game[] => {
