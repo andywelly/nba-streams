@@ -87,7 +87,7 @@ NBA Streams provides an easy-to-use platform for basketball fans to find and wat
 ## Authentication Flow
 
 The application supports:
-- Email/password authentication
+- Email/password authentication or Google Oauth
 - Guest mode access with limited features
 - Session persistence using NextAuth.js
 
