@@ -2,6 +2,9 @@
 
 NBA Streams provides an easy-to-use platform for basketball fans to find and watch NBA games. The application offers both authenticated user experiences and a guest mode for quick access.
 
+## Deployment
+(NBA Streams) https://nba-streams-pi.vercel.app
+
 ## Screenshots
 <img width="1493" alt="nba" src="https://github.com/user-attachments/assets/14595d8a-82b9-4da9-b811-287f96e78c02" />
 
