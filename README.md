@@ -8,6 +8,7 @@ NBA Streams provides an easy-to-use platform for basketball fans to find and wat
 ## Screenshots
 <img width="1493" alt="nba" src="https://github.com/user-attachments/assets/14595d8a-82b9-4da9-b811-287f96e78c02" />
 
+
 ## Features
 
 - **User Authentication**: Secure login and registration system
